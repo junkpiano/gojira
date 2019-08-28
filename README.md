@@ -26,7 +26,7 @@ gojira issues --jql "project=Awesome and status=Open"
 #### List of transitions
 
 ```bash
-gojira transition --jql "project=Awesome and status=Open"
+gojira transition --jql "project=Awesome and status=Open" --list
 ```
 
 #### Perform transition
