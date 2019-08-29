@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/urfave/cli"
 )
 
@@ -13,6 +11,9 @@ func AssigneeCommand() cli.Command {
 		Usage:   "change assignee",
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "reporter, r"},
+			cli.StringFlag{Name: "jql, j"},
+			cli.StringFlag{Name: "issue, i"},
+			cli.StringFlag{Name: "user, u"},
 		},
 		Action: func(c *cli.Context) error {
 			jc, err := NewClient()
@@ -21,33 +22,26 @@ func AssigneeCommand() cli.Command {
 				panic(err)
 			}
 
-			var issueKey string
+			jql := c.String("jql")
+			issueKey := c.String("issue")
+			user := c.String("user")
+			reporter := c.Bool("reporter")
+			issues, err := jc.findIssues(jql, issueKey)
 
-			if c.NArg() > 0 {
-				issueKey = c.Args().Get(0)
-			} else {
-				fmt.Println("IssueKey is required.")
-				return nil
-			}
-
-			if c.NArg() > 1 {
-				userName := c.Args().Get(1)
-				jc.UpdateAssignee(issueKey, &userName)
-			} else {
-				if c.Bool("reporter") {
-					issue, err := jc.Issue(issueKey)
-
-					if err != nil {
-						panic(err)
-					}
-
-					jc.UpdateAssignee(issueKey, &(issue.Fields.Creator.Name))
+			for _, issue := range *issues {
+				var err error
+				if reporter {
+					err = jc.UpdateAssignee(issueKey, &(issue.Fields.Creator.Name))
 				} else {
-					jc.UpdateAssignee(issueKey, nil)
+					err = jc.UpdateAssignee(issue.Key, &user)
+				}
+
+				if err != nil {
+					panic(err)
 				}
 			}
 
-			return err
+			return nil
 		},
 	}
 

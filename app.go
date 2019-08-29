@@ -8,7 +8,7 @@ import (
 
 func main() {
 	app := cli.NewApp()
-	app.Version = "0.1.1"
+	app.Version = "0.2.0"
 
 	app.Commands = []cli.Command{
 		IssuesCommand(),
