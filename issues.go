@@ -60,38 +60,31 @@ func UpdateIssueCommand() cli.Command {
 				panic(err)
 			}
 
-			var issueKey string
+			jql := c.String("jql")
+			issueKey := c.String("issue")
+			issues, err := jc.findIssues(jql, issueKey)
 
-			if c.NArg() > 0 {
-				issueKey = c.Args().Get(0)
-			} else {
-				fmt.Println("IssueKey is required.")
+			payload := c.String("payload")
+
+			if len(payload) == 0 {
+				fmt.Printf("payload json is required.")
 				return nil
 			}
 
-			jql := c.String("jql")
+			var data map[string]interface{}
+			err = json.Unmarshal([]byte(payload), &data)
+			if err != nil {
+				panic(err)
+			}
 
-			issues, err := jc.findIssues(jql, issueKey)
-
-			if c.NArg() > 1 {
-				payload := c.Args().Get(1)
-				var data map[string]interface{}
-				err := json.Unmarshal([]byte(payload), &data)
+			for _, issue := range *issues {
+				err = jc.UpdateIssue(issue.Key, data)
 				if err != nil {
 					panic(err)
 				}
-
-				for _, issue := range *issues {
-					err = jc.UpdateIssue(issue.Key, data)
-					if err != nil {
-						panic(err)
-					}
-				}
-			} else {
-				fmt.Println("json is required")
 			}
 
-			return err
+			return nil
 		},
 	}
 
