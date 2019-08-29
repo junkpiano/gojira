@@ -29,59 +29,31 @@ func TransitionCommand() cli.Command {
 			issueKey := c.String("issue")
 			list := c.Bool("list")
 
-			if len(jql) > 0 {
-				issues, err := jc.Search(jql)
+			issues, err := jc.findIssues(jql, issueKey)
 
-				if err != nil {
-					panic(err)
-				}
+			if err != nil {
+				panic(err)
+			}
 
-				if list {
-					for _, issue := range *issues {
-						ts, _ := jc.Transitions(issue.Key)
-						for _, t := range *ts {
-							fmt.Printf("%s: %s\n", t.Name, t.ID)
-						}
-					}
-					return nil
-				} else if len(action) == 0 {
-					fmt.Printf("Action is required.\n\n")
-					return nil
-				}
-
+			if list {
 				for _, issue := range *issues {
-					err := jc.DoTransition(issue.Key, c.String("action"))
-
-					if err != nil {
-						panic(err)
-					}
-				}
-			} else if len(issueKey) > 0 {
-				issue, err := jc.Issue(issueKey)
-
-				if err != nil {
-					panic(err)
-				}
-
-				if list {
 					ts, _ := jc.Transitions(issue.Key)
 					for _, t := range *ts {
-						fmt.Printf("%s: %s\n", t.Name, t.ID)
+						fmt.Printf("* %s: %s\n", t.Name, t.ID)
 					}
-					return nil
-				} else if len(action) == 0 {
-					fmt.Printf("Action is required.\n\n")
-					return nil
 				}
+				return nil
+			} else if len(action) == 0 {
+				fmt.Printf("Action is required.\n\n")
+				return nil
+			}
 
-				err = jc.DoTransition(issue.Key, c.String("action"))
+			for _, issue := range *issues {
+				err := jc.DoTransition(issue.Key, c.String("action"))
 
 				if err != nil {
 					panic(err)
 				}
-			} else {
-				fmt.Printf("Either jql or issue is required.")
-				return nil
 			}
 
 			return nil
@@ -89,8 +61,4 @@ func TransitionCommand() cli.Command {
 	}
 
 	return command
-}
-
-func listAction() {
-
 }

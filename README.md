@@ -21,6 +21,10 @@ That's it. gojira reads that information on the fly.
 gojira issues --jql "project=Awesome and status=Open"
 ```
 
+```bash
+gojira issues --issue AWESOME-123
+```
+
 ### Transition issues
 
 #### List of transitions
@@ -40,11 +44,34 @@ gojira transition --jql "project=RAwesome and status=Open" --action 111 # 111 is
 #### Assign
 
 ```bash
-gojira assignee Awesome-1234 username
+gojira assignee --issue Awesome-1234 --user username
 ```
 
-#### Assign back to creator
+```bash
+gojira assignee --jql "project=RAwesome and status=Open" --user username
+```
+
+#### Assign back to the reporter
 
 ```
-gojira assignee --reporter Awesome-1234
+gojira assignee --issue Awesome-1234 --reporter 
+```
+
+```bash
+gojira assignee --jql "project=RAwesome and status=Open" --reporter
+```
+
+### Update issues
+
+#### Update
+
+As of payload spec, please find your edition from [this page](https://developer.atlassian.com/server/jira/platform/rest-apis/).
+This tool uses `Edit issue` API.
+
+```bash
+gojira update --issue AWESOME-123 --payload "<json string>"
+```
+
+```bash
+gojira update --jql "project=RAwesome and status=Open" --payload "<json string>"
 ```
