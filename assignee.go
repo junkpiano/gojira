@@ -31,7 +31,7 @@ func AssigneeCommand() cli.Command {
 			for _, issue := range *issues {
 				var err error
 				if reporter {
-					err = jc.UpdateAssignee(issueKey, &(issue.Fields.Creator.Name))
+					err = jc.UpdateAssignee(issue.Key, &(issue.Fields.Creator.Name))
 				} else {
 					err = jc.UpdateAssignee(issue.Key, &user)
 				}
