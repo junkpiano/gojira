@@ -1,4 +1,4 @@
-module gojira
+module github.com/junkpiano/gojira
 
 go 1.12
 
