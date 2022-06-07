@@ -24,8 +24,12 @@ checksum:
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
 changelog:
-  sort: desc
+  sort: asc
+  use: github
   filters:
     exclude:
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
       - '^docs:'
       - '^test:'
