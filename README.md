@@ -33,10 +33,18 @@ gojira issues --issue AWESOME-123
 gojira transition --jql "project=Awesome and status=Open" --list
 ```
 
+```bash
+gojira transition --jql "project=Awesome and status=Open" --list --comment text
+```
+
 #### Perform transition
 
 ```bash
 gojira transition --jql "project=RAwesome and status=Open" --action 111 # 111 is ID of the next lane.
+```
+
+```bash
+gojira transition --jql "project=RAwesome and status=Open" --action 111 --comment text # 111 is ID of the next lane.
 ```
 
 ### Issue Assigning
