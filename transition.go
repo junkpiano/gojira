@@ -16,6 +16,7 @@ func TransitionCommand() cli.Command {
 			cli.StringFlag{Name: "action, a"},
 			cli.StringFlag{Name: "jql, j"},
 			cli.BoolFlag{Name: "list, l"},
+			cli.StringFlag{Name: "comment, c"},
 		},
 		Action: func(c *cli.Context) error {
 			jc, err := NewClient()
@@ -28,6 +29,7 @@ func TransitionCommand() cli.Command {
 			jql := c.String("jql")
 			issueKey := c.String("issue")
 			list := c.Bool("list")
+			comment := c.String("comment")
 
 			issues, err := jc.findIssues(jql, issueKey)
 
@@ -49,7 +51,11 @@ func TransitionCommand() cli.Command {
 			}
 
 			for _, issue := range *issues {
-				err := jc.DoTransition(issue.Key, c.String("action"))
+				if len(comment) == 0 {
+					err = jc.DoTransition(issue.Key, action)
+				} else {
+					err = jc.DoTransitionWithPayload(issue.Key, action, comment)
+				}
 
 				if err != nil {
 					panic(err)

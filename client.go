@@ -64,6 +64,25 @@ func (c *Client) DoTransition(issueKey, transitionID string) error {
 	return err
 }
 
+func (c *Client) DoTransitionWithPayload(issueKey, transitionID string, comment string) error {
+	payload := jira.CreateTransitionPayload{
+		Update: jira.TransitionPayloadUpdate{
+			Comment: []jira.TransitionPayloadComment{
+				{
+					Add: jira.TransitionPayloadCommentBody{
+						Body: comment,
+					},
+				},
+			},
+		},
+		Transition: jira.TransitionPayload{
+			ID: transitionID,
+		},
+	}
+	_, err := c.engine.Issue.DoTransitionWithPayload(issueKey, payload)
+	return err
+}
+
 func (c *Client) UpdateAssignee(issueKey string, userName *string) error {
 	var err error
 	if userName != nil {
