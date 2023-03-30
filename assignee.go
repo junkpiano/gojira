@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/urfave/cli"
 )
 
@@ -37,7 +39,7 @@ func AssigneeCommand() cli.Command {
 				}
 
 				if err != nil {
-					panic(err)
+					log.Println(err)
 				}
 			}
 
