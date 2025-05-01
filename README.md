@@ -83,3 +83,15 @@ gojira update --issue AWESOME-123 --payload "<json string>"
 ```bash
 gojira update --jql "project=RAwesome and status=Open" --payload "<json string>"
 ```
+
+## Installation
+
+### Download Binary
+
+Download from [here](https://github.com/junkpiano/gojira/releases)
+
+### Docker
+
+```
+docker run --rm ghcr.io/junkpiano/gojira:latest
+```
