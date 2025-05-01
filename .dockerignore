@@ -1,0 +1,24 @@
+# Ignore the Go build cache and binaries
+/bin/
+/pkg/
+/*.exe
+/*.out
+/*.o
+
+# Ignore version control directories
+.git/
+.gitignore
+
+# Ignore editor and IDE files
+*.swp
+*.swo
+*.idea/
+.vscode/
+
+# Ignore dependency directories (if applicable)
+vendor/
+
+# Ignore test and temporary files
+*.log
+*.tmp
+*.test
