@@ -1,31 +1,38 @@
-# Use an official Go image as the base image
-FROM golang:1.24-bookworm AS builder
+# syntax=docker/dockerfile:1.6      <-- enables $BUILDPLATFORM / $TARGETPLATFORM magic
 
-# Set the working directory inside the container
-WORKDIR /app
+############################  builder  ################################
+ARG GO_VERSION=1.22.3              # keep in one place; change when you upgrade Go
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-bookworm AS builder
 
-# Copy the Go module files and download dependencies
+# Build-time targets supplied by Buildx
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT   # e.g. "v8" for arm64/v8
+
+WORKDIR /src
+
+# 1️⃣  Download deps with cache
 COPY go.mod go.sum ./
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* \
-	&& go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
-# Copy the rest of the application source code
+# 2️⃣  Copy source + build for the *target* arch, but on the *host* tool-chain
 COPY . .
 
-# Build the Go application
-RUN go build -o gojira .
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 \
+    GOOS="$TARGETOS" GOARCH="$TARGETARCH" GOARM64="$TARGETVARIANT" \
+    go build -trimpath -ldflags="-s -w" -o /out/gojira ./...
 
-FROM debian:bookworm-slim
+############################  runtime  ################################
+FROM --platform=$TARGETPLATFORM debian:bookworm-slim
 
-# Set the working directory inside the container
+# (optional) non-root user for better container hygiene
+RUN useradd -r -s /sbin/nologin gojira
 WORKDIR /app
 
-# Copy the built binary from the builder stage
-COPY --from=builder /app/gojira .
+COPY --from=builder /out/gojira /usr/local/bin/gojira
+USER gojira
 
-# Expose a port if the application listens on one (optional)
-# EXPOSE 8080
-
-# Set the default command to run the application
-
-CMD ["./gojira"]
+# EXPOSE 8080    # ← uncomment if your app listens here
+ENTRYPOINT ["/usr/local/bin/gojira"]
